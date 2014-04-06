@@ -74,6 +74,9 @@ int64 nHPSTimerStart;
 // Settings
 int64 nTransactionFee = MIN_TX_FEE;
 
+//FORK PARAMETERS
+ int const HARD_FORK_HEIGHT_A = 29356;
+ int const SOFT_FORK_DISCONNECT_HEIGHT = HARD_FORK_HEIGHT_A - 1;
 
 
 
@@ -2886,14 +2889,13 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         return true;
     }
 
-
-
-
-
     if (strCommand == "version")
     {
         // Each connection can only send one version message
-        if (pfrom->nVersion != 0)
+        //if (pfrom->nVersion != 0)
+
+        //Disconnect the older clients
+        if (pfrom->nVersion < MIN_PROTO_VERSION && nBestHeight > SOFT_FORK_DISCONNECT_HEIGHT)
         {
             pfrom->Misbehaving(1);
             return false;
@@ -2906,8 +2908,11 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         vRecv >> pfrom->nVersion >> pfrom->nServices >> nTime >> addrMe;
         if (pfrom->nVersion < MIN_PROTO_VERSION)
         {
-            // Since February 20, 2012, the protocol is initiated at version 209,
-            // and earlier versions are no longer supported
+            printf("partner %s using obsolete version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
+            pfrom->fDisconnect = true;
+            return false;
+            //HANDLE SOFT FORKS
+        } else if (pfrom->nVersion < (MIN_PROTO_VERSION-1)){
             printf("partner %s using obsolete version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);
             pfrom->fDisconnect = true;
             return false;
