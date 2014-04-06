@@ -56,7 +56,7 @@ const std::string CLIENT_NAME("SHACoin");
 
 #ifndef BUILD_DATE
 #    ifdef GIT_COMMIT_DATE
-#        define BUILD_DATE "Mar. 14, 2014"
+#        define BUILD_DATE "Apr. 5, 2014"
 #    else
 #        define BUILD_DATE __DATE__ ", " __TIME__
 #    endif
